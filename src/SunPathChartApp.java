@@ -12,6 +12,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -21,7 +22,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import javax.swing.Timer;
+import javax.imageio.ImageIO;
 
 public class SunPathChartApp extends JFrame {
 
@@ -62,6 +63,7 @@ public class SunPathChartApp extends JFrame {
         JMenuItem openItem = new JMenuItem("Open CSV File");
         openItem.addActionListener(e -> loadFile());
         menu.add(openItem);
+
 
         JMenuItem settingsItem = new JMenuItem("Settings");
         settingsItem.addActionListener(e -> openSettings());
@@ -115,6 +117,7 @@ public class SunPathChartApp extends JFrame {
             new LoadDatasetWorker(selectedFile).execute();
         }
     }
+
 
     private class LoadDatasetWorker extends SwingWorker<Void, XYSeries> {
         private File file;
@@ -218,6 +221,22 @@ public class SunPathChartApp extends JFrame {
 
     public Color getBackgroundColor() {
         return backgroundColor;
+    }
+
+    public void setChartTitle(String title) {
+        chart.setTitle(title);
+    }
+
+    public String getChartTitle() {
+        return chart.getTitle().getText();
+    }
+
+    public void setLegendVisible(boolean visible) {
+        chart.getLegend().setVisible(visible);
+    }
+
+    public boolean isLegendVisible() {
+        return chart.getLegend().isVisible();
     }
 
     public static void main(String[] args) {

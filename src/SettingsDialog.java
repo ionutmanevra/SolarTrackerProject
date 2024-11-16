@@ -8,7 +8,7 @@ public class SettingsDialog extends JDialog {
     public SettingsDialog(SunPathChartApp owner) {
         super(owner, "Settings", true);
         this.chartApp = owner;
-        setSize(400, 300);
+        setSize(400, 400);
         setLocationRelativeTo(owner);
 
         JPanel panel = new JPanel();
@@ -51,6 +51,20 @@ public class SettingsDialog extends JDialog {
             }
         });
         panel.add(backgroundColorButton);
+
+        JLabel titleLabel = new JLabel("Chart Title:");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        panel.add(titleLabel);
+
+        JTextField titleField = new JTextField(chartApp.getChartTitle());
+        titleField.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleField.addActionListener(e -> chartApp.setChartTitle(titleField.getText()));
+        panel.add(titleField);
+
+        JCheckBox legendCheckBox = new JCheckBox("Show Legend", chartApp.isLegendVisible());
+        legendCheckBox.setAlignmentX(Component.CENTER_ALIGNMENT);
+        legendCheckBox.addActionListener(e -> chartApp.setLegendVisible(legendCheckBox.isSelected()));
+        panel.add(legendCheckBox);
 
         JButton closeButton = new JButton("Close");
         closeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
