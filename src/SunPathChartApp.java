@@ -2,6 +2,7 @@ import javax.swing.*;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.annotations.XYTextAnnotation;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.ValueAxis;
@@ -12,7 +13,6 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -22,7 +22,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import javax.imageio.ImageIO;
 
 public class SunPathChartApp extends JFrame {
 
@@ -64,10 +63,11 @@ public class SunPathChartApp extends JFrame {
         openItem.addActionListener(e -> loadFile());
         menu.add(openItem);
 
-
         JMenuItem settingsItem = new JMenuItem("Settings");
         settingsItem.addActionListener(e -> openSettings());
         menu.add(settingsItem);
+
+
 
         menuBar.add(menu);
         setJMenuBar(menuBar);
@@ -118,7 +118,6 @@ public class SunPathChartApp extends JFrame {
         }
     }
 
-
     private class LoadDatasetWorker extends SwingWorker<Void, XYSeries> {
         private File file;
 
@@ -156,6 +155,11 @@ public class SunPathChartApp extends JFrame {
             dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
             XYSeries series = new XYSeries("Light Intensity");
 
+            double maxIntensity = Double.MIN_VALUE;
+            double minIntensity = Double.MAX_VALUE;
+            long maxTime = 0;
+            long minTime = 0;
+
             try (BufferedReader br = new BufferedReader(new FileReader(file))) {
                 String line;
                 boolean isFirstLine = true;
@@ -173,6 +177,16 @@ public class SunPathChartApp extends JFrame {
 
                         series.add(timeInMillis, lightIntensity);
                         publish(series);
+
+                        if (lightIntensity > maxIntensity) {
+                            maxIntensity = lightIntensity;
+                            maxTime = timeInMillis;
+                        }
+                        if (lightIntensity < minIntensity) {
+                            minIntensity = lightIntensity;
+                            minTime = timeInMillis;
+                        }
+
                         if (animationsEnabled) {
                             Thread.sleep(animationDelay);
                         }
@@ -181,6 +195,17 @@ public class SunPathChartApp extends JFrame {
                     }
                 }
             }
+
+            XYPlot plot = chart.getXYPlot();
+            XYTextAnnotation maxAnnotation = new XYTextAnnotation("Max: " + maxIntensity, maxTime + 1000000, maxIntensity + 5);
+            maxAnnotation.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            maxAnnotation.setPaint(Color.RED);
+            plot.addAnnotation(maxAnnotation);
+
+            XYTextAnnotation minAnnotation = new XYTextAnnotation("Min: " + minIntensity, minTime + 1000000, minIntensity - 5);
+            minAnnotation.setFont(new Font("SansSerif", Font.PLAIN, 12));
+            minAnnotation.setPaint(Color.GREEN);
+            plot.addAnnotation(minAnnotation);
         }
     }
 
